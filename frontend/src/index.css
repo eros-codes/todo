@@ -5,8 +5,8 @@
   --accent:#2b6ff7;
   --muted:#666;
 
-  --card-width: 320px;   /* عرض هر کارت (قابل تغییر) */
-  --card-height: 320px;  /* ارتفاع هدف هر کارت */
+  --card-width: 450px;   /* عرض هر کارت (قابل تغییر) */
+  --card-height: 300px;  /* ارتفاع هدف هر کارت */
   --card-gap: 12px;      /* فاصله بین کارت‌ها */
   --card-padding: 14px;
   --font-size: 14px;
