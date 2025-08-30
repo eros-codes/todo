@@ -1,16 +1,19 @@
+/* frontend/src/index.css */
 :root{
   --bg:#f5f7fb;
   --card:#fff;
   --accent:#2b6ff7;
   --muted:#666;
 
-  --card-width: 450px;   /* عرض هدف هر کارت (قابل تغییر) */
-  --card-height: 300px;  /* ارتفاع ثابت هر کارت (قابل تغییر) */
-  --card-gap: 12px;      /* فاصله بین کارت‌ها (کم شده) */
+  --card-width: 320px;   /* عرض هر کارت (قابل تغییر) */
+  --card-height: 320px;  /* ارتفاع هدف هر کارت */
+  --card-gap: 12px;      /* فاصله بین کارت‌ها */
   --card-padding: 14px;
   --font-size: 14px;
+  --shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
+/* پایه */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -24,45 +27,52 @@ body{
   -moz-osx-font-smoothing:grayscale;
 }
 
-/* فونت فارسی برای عناصری که lang=fa می‌گیرند */
+/* فارسی/انگلیسی */
 [lang="fa"] {
   font-family: 'Vazirmatn', Tahoma, sans-serif;
   direction: rtl;
   text-align: right;
 }
-
 [lang="en"] {
   font-family: 'Inter', Roboto, Arial, sans-serif;
   direction: ltr;
   text-align: left;
 }
 
-/* ----- ظرف کارت‌ها: گرید با 3 ستون ثابت ----- */
+/* گرید کارت‌ها: سه ستون در دسکتاپ، دو در تبلت، یک در موبایل */
 .lists{
   display: grid;
-  grid-template-columns: repeat(3, var(--card-width)); /* همیشه 3 ستون در دسکتاپ */
-  justify-content: center; /* کارت‌ها وسط چین شوند داخل کانتینر */
+  grid-template-columns: repeat(3, var(--card-width));
+  justify-content: center;
   gap: var(--card-gap);
   align-items: start;
   width: 100%;
+  margin: 0 auto;
 }
 
-/* ----- کارت‌ها: اندازه ثابت، ستون-محور ----- */
+/* کارت: اندازه ثابت ظاهری، اما محتوای داخلی اسکرول می‌شود */
 .list{
   background: var(--card);
   padding: var(--card-padding);
   border-radius: 10px;
   width: var(--card-width);
-  height: var(--card-height);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  min-height: var(--card-height); /* از min-height استفاده می‌کنیم تا کارت در صورت نیاز رشد نکند */
+  box-shadow: var(--shadow);
   position: relative;
-  overflow: hidden; /* محتوا داخل اسکرول می‌شود */
+  overflow: hidden; /* محتوای اضافی داخل اسکرول می‌شود */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  transition: background 180ms ease, transform 160ms ease;
 }
 
-/* عنوان بالای کارت */
+/* وقتی کارتی انتخاب/هور شد کمی برجسته شود */
+.list:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.09);
+}
+
+/* عنوان */
 .list h2{
   margin: 0 0 12px;
   font-size: 1.05rem;
@@ -72,7 +82,7 @@ body{
   text-overflow: ellipsis;
 }
 
-/* بخش اسکرولی آیتم‌ها */
+/* آیتم‌ها (قابل اسکرول) */
 .items{
   flex: 1 1 auto;
   min-height: 0; /* ضروری برای scroll در flex */
@@ -81,12 +91,13 @@ body{
   gap:8px;
   padding-right:6px;
   overflow-y:auto;
+  padding-bottom: 8px;
 }
 
-/* وقتی لیست خالی است */
+/* وقتی خالیه */
 .empty{ opacity:.6; font-size:.95rem; }
 
-/* ردیف ورودی و دکمه‌ها در پایین ثابت بماند */
+/* ردیف ورودی پایین */
 .input-row{
   display:flex;
   gap:8px;
@@ -95,7 +106,7 @@ body{
   align-items:center;
 }
 
-/* ورودی‌ها و دکمه‌ها استاندارد */
+/* ورودی‌ها */
 .input-row input, textarea, .edit-input{
   flex: 1 1 auto;
   min-width: 0;
@@ -103,40 +114,86 @@ body{
   border-radius:8px;
   border:1px solid #ddd;
   font-size: var(--font-size);
+  background: #fff;
 }
+
+/* دکمه‌ها پایه */
 .input-row button, .item-controls button{
   padding:8px 10px;
   border-radius:8px;
   border:0;
-  background:var(--accent);
-  color:#fff;
   cursor:pointer;
   flex: 0 0 auto;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-/* Add-category باید همانند کارت‌ها رفتار کند */
+/* plus btn (پیش‌فرض آبی) */
+.plus-btn{
+  padding:10px 14px;
+  border-radius:8px;
+  background:var(--accent);
+  color:#fff; 
+  border:0;
+  cursor:pointer;
+  font-size:var(--font-size);
+  box-shadow: 0 6px 14px rgba(43,111,247,0.12);
+  margin-bottom: 12px;
+}
+.plus-btn:active{ transform: translateY(1px); }
+
+/* plus btn سفید (وقتی کارت رنگی میشه) */
+.plus-btn--white {
+  background: #ffffff;
+  color: #111;
+  border: 1px solid #ddd;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+}
+
+/* Add button variants */
+.add-btn{
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:var(--font-size);
+  cursor:pointer;
+}
+.add-btn--accent{
+  background:var(--accent);
+  color:#fff;
+  border:0;
+  box-shadow: 0 6px 14px rgba(43,111,247,0.12);
+}
+.add-btn--white{
+  background:#ffffff;
+  color:#111;
+  border:1px solid #ddd;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+}
+
+/* cancel */
+.cancel-btn{
+  border-radius:8px;
+  padding:8px 10px;
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #111;
+  cursor: pointer;
+}
+
+/* add-category card (رفتار مثل کارت‌ها) */
 .add-category-card{
   display:flex;
   align-items:center;
   justify-content:center;
   padding: var(--card-padding);
   width: var(--card-width);
-  height: var(--card-height);
+  min-height: var(--card-height);
   box-sizing: border-box;
+  background: var(--card);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
 }
 
-/* دکمه + یکدست */
-.plus-btn{
-  padding:10px 14px;
-  border-radius:8px;
-  background:var(--accent);
-  color:#fff;
-  border:0;
-  cursor:pointer;
-  font-size:var(--font-size);
-}
-
-/* دکمه حذف دسته داخل کارت (بالا-راست) */
+/* حذف دسته (در بالا-راست) */
 .category-delete{
   position:absolute;
   top:10px;
@@ -154,7 +211,7 @@ body{
   box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
-/* آیتم‌های داخل کارت */
+/* todo item */
 .todo-item{
   padding:8px;
   border-radius:8px;
@@ -170,12 +227,12 @@ body{
 }
 .todo-item span{ flex:1; min-width:0; word-break:break-word; }
 
-/* کنترل‌ها */
+/* controls */
 .item-controls{display:flex;gap:8px;align-items:center}
 .item-controls button{background:transparent;color:var(--muted);padding:6px;border-radius:6px;border:1px solid transparent}
 .item-controls button:hover{background:#eee;color:#000;border-color:#ddd}
 
-/* per-language input styles */
+/* per-language inputs */
 input[lang="fa"], textarea[lang="fa"], [contenteditable][lang="fa"] {
   font-family: 'Vazirmatn', Tahoma, sans-serif;
   direction: rtl;
@@ -187,13 +244,65 @@ input[lang="en"], textarea[lang="en"], [contenteditable][lang="en"] {
   text-align: left;
 }
 
-/* ----- responsive: ابتدا دو ستون، سپس موبایل یک ستون ----- */
+/* ===== color toggle & palette ===== */
+/* circle button next to delete */
+.color-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid #eee;
+  cursor: pointer;
+  padding:6px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+.color-toggle span{ width:16px; height:16px; border-radius:999px; display:inline-block; }
+
+/* palette popover (absolute inside .list) */
+.color-palette{
+  position: absolute;
+  top: 48px; /* قابل تنظیم */
+  right: 10px;
+  display:flex;
+  gap:8px;
+  padding:8px;
+  background: #fff;
+  border-radius:8px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);
+  z-index: 99999;
+  white-space: nowrap;
+}
+
+/* each color swatch */
+.color-swatch{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:2px solid rgba(255,255,255,0.8);
+  cursor:pointer;
+  padding:0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.color-swatch:hover{ transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+
+/* ensure palette visible over content */
+.list { position: relative; z-index: 0; }
+
+/* nice small scrollbar look (optional) */
+.items::-webkit-scrollbar{ width:8px }
+.items::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.08); border-radius:8px }
+
+/* responsive */
 @media (max-width: 1100px){
   .lists{ grid-template-columns: repeat(2, var(--card-width)); justify-content: center; }
 }
 @media (max-width: 720px){
   .lists{ grid-template-columns: 1fr; justify-content: stretch; }
   :root{ --card-width: 100%; --card-height: 260px; }
-  .list, .add-category-card{ width: 100%; height: var(--card-height); max-width: none; }
+  .list, .add-category-card{ width: 100%; min-height: var(--card-height); max-width: none; }
   .category-delete{ top:8px; right:8px; padding:4px 6px; font-size:13px; }
 }

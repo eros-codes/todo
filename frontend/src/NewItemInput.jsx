@@ -1,6 +1,12 @@
+// src/NewItemInput.jsx
 import React, { useEffect, useRef, useState } from "react";
 
-export default function NewItemInput({ onAdd }) {
+/**
+ * props:
+ *  - onAdd(text)
+ *  - addButtonWhite (boolean) -> اگر true باشه دکمه Add و دکمه + سفید میشن
+ */
+export default function NewItemInput({ onAdd, addButtonWhite = false }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const ref = useRef(null);
@@ -17,10 +23,19 @@ export default function NewItemInput({ onAdd }) {
     setOpen(false);
   }
 
+  // کلاس‌های دکمه Add و دکمه plus بر اساس پراب تنظیم می‌شوند
+  const addBtnClass = addButtonWhite ? "add-btn add-btn--white" : "add-btn add-btn--accent";
+  const plusClass = addButtonWhite ? "plus-btn plus-btn--white" : "plus-btn";
+
   return (
     <div className="new-input">
       {!open ? (
-        <button className="plus-btn" onClick={() => setOpen(true)} aria-label="add new task">
+        <button
+          className={plusClass}
+          onClick={() => setOpen(true)}
+          aria-label="add new task"
+          title="Add task"
+        >
           ＋
         </button>
       ) : (
@@ -39,8 +54,20 @@ export default function NewItemInput({ onAdd }) {
             placeholder="Your new task"
             aria-label="New task"
           />
-          <button onClick={submit} aria-label="add">Add</button>
-          <button onClick={() => { setText(""); setOpen(false); }} aria-label="cancel">Cancel</button>
+          <button onClick={submit} aria-label="add" className={addBtnClass}>
+            Add
+          </button>
+          <button
+            onClick={() => {
+              setText("");
+              setOpen(false);
+            }}
+            aria-label="cancel"
+            className="cancel-btn"
+            title="Cancel"
+          >
+            Cancel
+          </button>
         </div>
       )}
     </div>
