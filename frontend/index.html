@@ -8,6 +8,13 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
 
+    <!-- PWA / mobile -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2b6ff7">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
     <style>
       html { direction: ltr; }
       body {
@@ -61,7 +68,7 @@
         document.addEventListener('input', function(e){
           const t = e.target;
           if(!t) return;
-          if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) {
+          if(t.tagName === 'INPUT' || t.TAGName === 'TEXTAREA' || t.isContentEditable) {
             detectAndSetLang(t);
           }
         }, true);
