@@ -13,7 +13,11 @@
     <meta name="theme-color" content="#2b6ff7">
 
     <!-- iOS specific (Safari ignores manifest for icon) -->
+    <!-- ideally provide a proper 180x180 file; if not, 192 will be used and scaled -->
     <link rel="apple-touch-icon" sizes="180x180" href="./icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="To Do">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -46,17 +50,17 @@
         text-align: left;
       }
     </style>
+
+    <!-- Vite build outputs may reference /todo/... because base is /todo/ -->
     <script type="module" crossorigin src="/todo/assets/index-Bv6y9KM_.js"></script>
     <link rel="stylesheet" crossorigin href="/todo/assets/index-m_-C-aec.css">
   </head>
   <body>
     <div id="root"></div>
-
 
     <script>
       (function(){
         const persianRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-
         function detectAndSetLang(el){
           try{
             const v = el.value || el.textContent || '';
@@ -73,7 +77,6 @@
         document.addEventListener('input', function(e){
           const t = e.target;
           if(!t) return;
-          // <= FIXED: use tagName (not TAGNAME)
           if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) {
             detectAndSetLang(t);
           }
@@ -89,7 +92,7 @@
       // register service worker (only if supported)
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // use relative path so it works under GH-Pages base
+          // relative path so it works in docs/ and under /todo/ base
           navigator.serviceWorker.register('./service-worker.js')
             .then(reg => console.log('SW registered', reg.scope))
             .catch(err => console.warn('SW register failed', err));
