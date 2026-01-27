@@ -1,5 +1,5 @@
 // src/NewItemInput.jsx
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * props:
@@ -36,7 +36,7 @@ export default function NewItemInput({ onAdd, addButtonWhite = false }) {
           aria-label="add new task"
           title="Add task"
         >
-          ＋
+          +
         </button>
       ) : (
         <div className="input-row">
@@ -54,16 +54,17 @@ export default function NewItemInput({ onAdd, addButtonWhite = false }) {
             placeholder="Your new task"
             aria-label="New task"
           />
-          <button onClick={submit} aria-label="add" className={addBtnClass}>
+          <button type="button" onClick={submit} aria-label="add" className={addBtnClass}>
             Add
           </button>
           <button
+            type="button"
             onClick={() => {
               setText("");
               setOpen(false);
             }}
             aria-label="cancel"
-            className="cancel-btn"
+            className={`cancel-btn ${addBtnClass}`}
             title="Cancel"
           >
             Cancel

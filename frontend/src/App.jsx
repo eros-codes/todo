@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TodoList from "./TodoList";
-import "./index.css";
 
 export default function App() {
   const [categories, setCategories] = useState(() => {
@@ -65,30 +64,41 @@ export default function App() {
       <div className="lists">
         {categories.map((c) => (
           <div key={c.id} className="list">
-            {/* delete button داخل بلوک و در گوشه بالا-راست */}
-            <button
-              className="category-delete"
-              title={`Delete ${c.title}`}
-              onClick={() => removeCategory(c.id)}
-              aria-label={`Delete category ${c.title}`}
-            >
-              ❌
-            </button>
-
-            <TodoList title={c.title} storageKey={c.storageKey} />
+            <TodoList
+              title={c.title}
+              storageKey={c.storageKey}
+              onDelete={() => removeCategory(c.id)}
+            />
           </div>
         ))}
 
         {/* Add-category card به صورت یک .list تا اندازه برابر داشته باشد */}
         <div className="list add-category-card">
           {!adding ? (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <button
                 className="plus-btn"
                 onClick={() => setAdding(true)}
                 aria-label="Add new category"
               >
-                ＋ Add category
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 12 12"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M6 1.75a.75.75 0 0 1 .75.75v2.75H9.5a.75.75 0 0 1 0 1.5H6.75V9.5a.75.75 0 0 1-1.5 0V6.75H2.5a.75.75 0 0 1 0-1.5h2.75V2.5A.75.75 0 0 1 6 1.75"
+                  />
+                </svg>
+                Add category
               </button>
             </div>
           ) : (
@@ -113,16 +123,13 @@ export default function App() {
                   border: "1px solid #ddd",
                 }}
               />
-              <button onClick={addCategory} style={{ padding: "8px 10px", borderRadius: 8 }}>
+              <button type="button" onClick={addCategory} className="add-btn add-btn--accent" style={{ padding: "8px 10px", borderRadius: 8 }}>
                 Add
               </button>
-              <button
-                onClick={() => {
+              <button type="button" onClick={() => {
                   setNewTitle("");
                   setAdding(false);
-                }}
-                style={{ padding: "8px 10px", borderRadius: 8 }}
-              >
+                }} className="cancel-btn add-btn add-btn--accent" style={{ padding: "8px 10px", borderRadius: 8 }}>
                 Cancel
               </button>
             </div>

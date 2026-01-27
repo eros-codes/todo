@@ -1,5 +1,5 @@
 // frontend/src/TodoItem.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function TodoItem({ item, onToggle, onDelete, onEdit }) {
   const [editing, setEditing] = useState(false);
@@ -45,8 +45,17 @@ export default function TodoItem({ item, onToggle, onDelete, onEdit }) {
       <div className="item-controls">
         {!editing ? (
           <>
-            <button onClick={() => setEditing(true)} aria-label="Edit">✏️</button>
-            <button onClick={onDelete} aria-label="delete">❌</button>
+            <button onClick={() => setEditing(true)} aria-label="Edit" title="Edit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+              </svg>
+            </button>
+            <button onClick={onDelete} aria-label="Delete" title="Delete">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </>
         ) : (
           <>

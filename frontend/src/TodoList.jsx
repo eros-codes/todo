@@ -1,18 +1,20 @@
 // src/TodoList.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TodoItem from "./TodoItem";
 import NewItemInput from "./NewItemInput";
 
 const PALETTE = [
   { name: "white", value: "#ffffff" },
-  { name: "blue", value: "#2b6ff7" },
   { name: "green", value: "#22c55e" },
-  { name: "yellow", value: "#f59e0b" },
-  { name: "orange", value: "#fb923c" },
+  { name: "blue", value: "#2b6ff7" },
+  { name: "purple", value: "#a855f7" },
+  { name: "pink", value: "#f7bdcd" },
   { name: "red", value: "#ef4444" },
+  { name: "orange", value: "#fb923c" },
+  { name: "brown", value: "#d2691e" },
 ];
 
-export default function TodoList({ title, storageKey }) {
+export default function TodoList({ title, storageKey, onDelete }) {
   const [tasks, setTasks] = useState(() => {
     try {
       const raw = localStorage.getItem(storageKey);
@@ -71,16 +73,30 @@ export default function TodoList({ title, storageKey }) {
     setPaletteOpen(false);
   };
 
-  const addButtonWhite =
-    color.toLowerCase() !== "#ffffff" && color.toLowerCase() !== "white";
+  const isWhite =
+    color.toLowerCase() === "#ffffff" || color.toLowerCase() === "white";
+
+  const addButtonWhite = !isWhite;
 
   return (
     <section
       className="list"
       aria-labelledby={`list-${storageKey}`}
-      style={{ background: color, position: "relative" }}
+      style={{
+        background: color,
+        position: "relative",
+        // set a CSS variable for this list's accent so checkboxes can use it
+        ["--list-accent"]: isWhite ? "var(--accent)" : color,
+      }}
     >
-      <h2 id={`list-${storageKey}`}>{title}</h2>
+      <h2 
+        id={`list-${storageKey}`}
+        style={{
+          color: color.toLowerCase() === "#ffffff" || color.toLowerCase() === "#f7f7f7" ? "#111" : "#fff"
+        }}
+      >
+        {title}
+      </h2>
 
       <div
         style={{
@@ -88,7 +104,8 @@ export default function TodoList({ title, storageKey }) {
           top: 10,
           right: 10,
           display: "flex",
-          gap: 8,
+          gap: 12,
+          alignItems: "center",
         }}
       >
         <button
@@ -100,16 +117,25 @@ export default function TodoList({ title, storageKey }) {
           <span
             style={{
               display: "inline-block",
-              width: 14,
-              height: 14,
+              width: 18,
+              height: 18,
               borderRadius: 99,
               background: color,
-              border:
-                color.toLowerCase() === "#ffffff"
-                  ? "1px solid #ddd"
-                  : "1px solid rgba(0,0,0,0.12)",
+              border: "2px solid #fff",
             }}
           />
+        </button>
+        
+        <button
+          className="category-delete"
+          title={`Delete ${title}`}
+          onClick={onDelete}
+          aria-label={`Delete category ${title}`}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
 

@@ -1,16 +1,17 @@
 {
-  "name": "frontend",
+  "name": "to-do-list",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
-  "homepage": "https://eros-codes.github.io/todo",
+  "description": "A simple, modern to-do list application built with React and Vite",
+  "author": "Your Name",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d docs"
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "react": "^19.1.1",
