@@ -14,7 +14,57 @@ const PALETTE = [
   { name: "brown", value: "#d2691e" },
 ];
 
-export default function TodoList({ title, storageKey, onDelete }) {
+// darker/desaturated palette for dark mode so swatches and card backgrounds look right
+const PALETTE_DARK = [
+  { name: "white", value: "#0b1116" },
+  { name: "green", value: "#0f5130" },
+  { name: "blue", value: "#112e6a" },
+  { name: "purple", value: "#3b0f63" },
+  { name: "pink", value: "#8b1450" },
+  { name: "red", value: "#b91c1c" },
+  { name: "orange", value: "#b54708" },
+  { name: "brown", value: "#4b2e1a" },
+];
+
+function isDocumentDark() {
+  try { return document?.documentElement?.getAttribute('data-theme') === 'dark' } catch { return false }
+}
+
+function isLightColor(hex) {
+  try {
+    const c = hex.replace('#','');
+    const bigint = parseInt(c.length === 3 ? c.split('').map(ch=>ch+ch).join('') : c, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    // perceived brightness
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 180;
+  } catch { return true }
+}
+
+function rgbToHex(rgb) {
+  try {
+    const m = rgb.match(/rgba?\(([^)]+)\)/);
+    if (!m) return rgb;
+    const parts = m[1].split(',').map(p => parseFloat(p.trim()));
+    const [r,g,b] = parts;
+    return '#'+[r,g,b].map(x=>{
+      const v = Math.round(x);
+      return v.toString(16).padStart(2,'0');
+    }).join('');
+  } catch { return rgb }
+}
+
+function normalizeColorString(s){
+  if (!s) return s;
+  const str = String(s).trim().toLowerCase();
+  if (str.startsWith('rgb')) return rgbToHex(str);
+  return str;
+}
+
+export default function TodoList({ title, storageKey, onDelete, theme, themeVersion }) {
+  const dark = (theme === 'dark') || isDocumentDark();
   const [tasks, setTasks] = useState(() => {
     try {
       const raw = localStorage.getItem(storageKey);
@@ -31,6 +81,54 @@ export default function TodoList({ title, storageKey, onDelete }) {
       return "#ffffff";
     }
   });
+
+  // Re-read stored color whenever themeVersion changes (force update when App maps colors)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`${storageKey}-color`);
+      if (stored) setColor(stored);
+    } catch {}
+  }, [themeVersion, storageKey]);
+
+  // On mount: if stored color matches a dark-palette value, normalize to the canonical PALETTE value
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`${storageKey}-color`);
+      if (!stored) return;
+      const norm = normalizeColorString(stored);
+      const idxDark = PALETTE_DARK.findIndex(p => p.value.toLowerCase() === norm);
+      if (idxDark !== -1) {
+        const lightVal = PALETTE[idxDark]?.value;
+        if (lightVal) {
+          setColor(lightVal);
+          localStorage.setItem(`${storageKey}-color`, lightVal);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Resolve a stored (light) color to the theme-appropriate display color.
+  function resolveColorForTheme(col) {
+    try {
+      const dark = (theme === 'dark') || isDocumentDark();
+      if (!col) return col;
+      const norm = normalizeColorString(col);
+      // find index in PALETTE (match by value or name)
+      let idx = PALETTE.findIndex(p => p.value.toLowerCase() === norm || p.name.toLowerCase() === norm);
+      if (idx === -1) {
+        // maybe the stored value is a dark variant; try PALETTE_DARK
+        idx = PALETTE_DARK.findIndex(p => p.value.toLowerCase() === norm || p.name.toLowerCase() === norm);
+        if (idx !== -1) {
+          return dark ? PALETTE_DARK[idx].value : PALETTE[idx].value;
+        }
+      } else {
+        return dark ? PALETTE_DARK[idx].value : PALETTE[idx].value;
+      }
+      // fallback: if stored value already looks like a dark variant, just return it
+      return col;
+    } catch { return col }
+  }
 
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -73,28 +171,22 @@ export default function TodoList({ title, storageKey, onDelete }) {
     setPaletteOpen(false);
   };
 
-  const isWhite =
-    color.toLowerCase() === "#ffffff" || color.toLowerCase() === "white";
-
-  const addButtonWhite = !isWhite;
+  const displayColor = resolveColorForTheme(color);
+  const isLightBg = isLightColor((displayColor || '#ffffff').toLowerCase());
+  const addButtonWhite = !isLightBg;
 
   return (
     <section
       className="list"
       aria-labelledby={`list-${storageKey}`}
       style={{
-        background: color,
+        background: displayColor,
         position: "relative",
         // set a CSS variable for this list's accent so checkboxes can use it
-        ["--list-accent"]: isWhite ? "var(--accent)" : color,
+        ["--list-accent"]: displayColor,
       }}
     >
-      <h2 
-        id={`list-${storageKey}`}
-        style={{
-          color: color.toLowerCase() === "#ffffff" || color.toLowerCase() === "#f7f7f7" ? "#111" : "#fff"
-        }}
-      >
+      <h2 id={`list-${storageKey}`} style={{ color: isLightBg ? '#111' : '#fff' }}>
         {title}
       </h2>
 
@@ -120,8 +212,8 @@ export default function TodoList({ title, storageKey, onDelete }) {
               width: 18,
               height: 18,
               borderRadius: 99,
-              background: color,
-              border: "2px solid #fff",
+              background: displayColor,
+              border: dark ? '2px solid rgba(255,255,255,0.06)' : '2px solid #fff',
             }}
           />
         </button>
@@ -141,7 +233,7 @@ export default function TodoList({ title, storageKey, onDelete }) {
 
       {paletteOpen && (
         <div className="color-palette" role="dialog" aria-label="color palette">
-          {PALETTE.map((p) => (
+          {(dark ? PALETTE_DARK : PALETTE).map((p) => (
             <button
               key={p.value}
               className="color-swatch"

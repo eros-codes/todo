@@ -2,6 +2,67 @@ import { useEffect, useRef, useState } from "react";
 import TodoList from "./TodoList";
 
 export default function App() {
+  // theme: 'light' | 'dark'
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('theme') || 'light' } catch { return 'light' }
+  });
+
+  const [themeVersion, setThemeVersion] = useState(0);
+
+  const PALETTE = [
+    { name: "white", value: "#ffffff" },
+    { name: "green", value: "#22c55e" },
+    { name: "blue", value: "#2b6ff7" },
+    { name: "purple", value: "#a855f7" },
+    { name: "pink", value: "#f7bdcd" },
+    { name: "red", value: "#ef4444" },
+    { name: "orange", value: "#fb923c" },
+    { name: "brown", value: "#d2691e" },
+  ];
+  const PALETTE_DARK = [
+    { name: "white", value: "#0b1116" },
+    { name: "green", value: "#0f5130" },
+    { name: "blue", value: "#112e6a" },
+    { name: "purple", value: "#3b0f63" },
+    { name: "pink", value: "#8b1450" },
+    { name: "red", value: "#b91c1c" },
+    { name: "orange", value: "#b54708" },
+    { name: "brown", value: "#4b2e1a" },
+  ];
+
+  function rgbToHex(rgb) {
+    try {
+      const m = rgb.match(/rgba?\(([^)]+)\)/);
+      if (!m) return rgb;
+      const parts = m[1].split(',').map(p => parseFloat(p.trim()));
+      const [r,g,b] = parts;
+      return '#'+[r,g,b].map(x=>{
+        const v = Math.round(x);
+        return v.toString(16).padStart(2,'0');
+      }).join('');
+    } catch { return rgb }
+  }
+
+  function normalizeColorString(s){
+    if (!s) return s;
+    const str = String(s).trim().toLowerCase();
+    if (str.startsWith('rgb')) return rgbToHex(str);
+    return str;
+  }
+
+  function mapColorForTheme(col, toDark) {
+    try {
+      const norm = normalizeColorString(col);
+      let idx = PALETTE.findIndex(p => p.value.toLowerCase() === norm || p.name.toLowerCase() === norm);
+      if (idx !== -1) return toDark ? PALETTE_DARK[idx].value : PALETTE[idx].value;
+      idx = PALETTE_DARK.findIndex(p => p.value.toLowerCase() === norm || p.name.toLowerCase() === norm);
+      if (idx !== -1) return toDark ? PALETTE_DARK[idx].value : PALETTE[idx].value;
+      return col;
+    } catch { return col }
+  }
+
+  
+
   const [categories, setCategories] = useState(() => {
     try {
       const raw = localStorage.getItem("todo-categories");
@@ -24,6 +85,30 @@ export default function App() {
       localStorage.setItem("todo-categories", JSON.stringify(categories));
     } catch {}
   }, [categories]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {}
+    try {
+      document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
+    } catch {}
+
+    // Convert stored category colors to matching theme variants and bump themeVersion
+    try {
+      const toDark = theme === 'dark';
+      categories.forEach(cat => {
+        const key = `${cat.storageKey}-color`;
+        try {
+          const stored = localStorage.getItem(key);
+          if (!stored) return;
+          const mapped = mapColorForTheme(stored, toDark);
+          if (mapped && mapped !== stored) localStorage.setItem(key, mapped);
+        } catch {}
+      });
+      setThemeVersion(v => v + 1);
+    } catch {}
+  }, [theme, categories]);
 
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -59,7 +144,21 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1>TO DO LIST</h1>
+      <div className="app-header">
+        <h1>TO DO LIST</h1>
+
+        <div className="theme-switch" aria-hidden>
+          <label style={{display:'inline-flex',alignItems:'center',gap:8}}>
+            <span style={{fontSize:12,color:'var(--muted)'}}>{theme === 'dark' ? 'Dark' : 'Light'}</span>
+            <button
+              className={`switch ${theme === 'dark' ? 'active' : ''}`}
+              aria-pressed={theme === 'dark'}
+              onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+              title="Toggle theme"
+            />
+          </label>
+        </div>
+      </div>
 
       <div className="lists">
         {categories.map((c) => (
@@ -68,6 +167,8 @@ export default function App() {
               title={c.title}
               storageKey={c.storageKey}
               onDelete={() => removeCategory(c.id)}
+              theme={theme}
+              themeVersion={themeVersion}
             />
           </div>
         ))}

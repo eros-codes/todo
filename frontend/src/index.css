@@ -4,6 +4,10 @@
   --card:#fff;
   --accent:#2b6ff7;
   --muted:#666;
+  --text: #111;
+  --header-text: #111;
+  --task-bg: #fbfcff;
+  --task-text: #111;
 
   --card-width: 450px;   /* عرض هر کارت (قابل تغییر) */
   --card-height: 300px;  /* ارتفاع هدف هر کارت */
@@ -14,6 +18,21 @@
   --top-btn-size: 36px;
 }
 
+/* dark mode overrides using attribute on <html> */
+:root[data-theme="dark"]{
+  --bg: #0b0f14;
+  --card: #0f1720;
+  --accent: #7aa2ff;
+  --muted: #9aa3b2;
+  --text: #e6eefc;
+  /* Header text should be white in dark mode per latest request */
+  --header-text: #fff;
+  --shadow: 0 6px 18px rgba(0,0,0,0.3);
+  --task-bg: #0f1822; /* slightly lighter than card */
+  --task-text: #9aa3ad; /* darker gray-ish text per request */
+  --control-color: var(--task-text);
+}
+
 /* پایه */
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -22,7 +41,7 @@ body{
   background:var(--bg);
   margin:0;
   padding:20px;
-  color:#111;
+  color:var(--text);
   direction: ltr;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
@@ -48,16 +67,33 @@ body{
   width: 100%;
 }
 
-.app h1 {
-  margin: 0 auto;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #111;
+.app-header{
   width: 100%;
   max-width: 1500px;
   padding: 0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.app h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--header-text);
   text-align: left;
 }
+
+/* theme switch (simple accessible toggle) */
+.theme-switch{ display:inline-flex; align-items:center; gap:10px }
+.theme-switch input{ position:absolute; opacity:0; pointer-events:none }
+.switch{
+  width:44px; height:24px; background: #ddd; border-radius:999px; position:relative; cursor:pointer; transition: background 180ms ease;
+}
+.switch::after{
+  content:''; width:18px; height:18px; background:#fff; border-radius:999px; position:absolute; top:3px; left:3px; box-shadow:0 4px 10px rgba(0,0,0,0.12); transition: transform 180ms ease;
+}
+.switch.active{ background: var(--accent); }
+.switch.active::after{ transform: translateX(20px); }
 
 /* گرید کارت‌ها: سه ستون در دسکتاپ، دو در تبلت، یک در موبایل */
 .lists{
@@ -160,7 +196,7 @@ input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: var(--accent);
+  accent-color: var(--list-accent, var(--accent));
 }
 
 input[type="checkbox"]:hover {
@@ -341,8 +377,9 @@ input[type="checkbox"]:hover {
 .todo-item{
   padding:8px;
   border-radius:8px;
-  border:1px solid #f0f0f0;
-  background:#fbfcff;
+  border:1px solid rgba(0,0,0,0.06);
+  background: var(--task-bg);
+  color: var(--task-text);
   display:flex;
   align-items:center;
   gap:10px;
@@ -414,6 +451,104 @@ input[lang="en"], textarea[lang="en"], [contenteditable][lang="en"] {
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .color-swatch:hover{ transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+
+/* make swatch borders less bright in dark mode */
+:root[data-theme="dark"] .color-swatch{
+  /* remove bright border and make swatches more subtle */
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* Dark-mode control color overrides: plus, add buttons, delete X */
+:root[data-theme="dark"] .plus-btn{
+  background: var(--task-bg);
+  color: var(--task-text);
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+:root[data-theme="dark"] .plus-btn.plus-btn--white{
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+:root[data-theme="dark"] .add-btn--accent{
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .category-delete{
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: none;
+}
+
+/* color palette container in dark mode shouldn't be white */
+:root[data-theme="dark"] .color-palette{
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.6);
+}
+
+/* add-btn white variant in dark mode */
+:root[data-theme="dark"] .add-btn.add-btn--white,
+:root[data-theme="dark"] .add-btn--white{
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: none;
+}
+
+/* remove any black outline around swatches when focused/active in dark */
+:root[data-theme="dark"] .color-swatch:focus,
+:root[data-theme="dark"] .color-swatch:active{
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* color-toggle outline and inner dot border in dark mode */
+:root[data-theme="dark"] .color-toggle{
+  background: var(--task-bg);
+  border: 1px solid rgba(255,255,255,0.03);
+  color: var(--task-text);
+}
+:root[data-theme="dark"] .color-toggle span{
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+/* add-category input uses task colors in dark mode */
+:root[data-theme="dark"] .add-category-card input{
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* item control hover should not be bright white in dark mode */
+:root[data-theme="dark"] .item-controls button:hover{
+  background: rgba(255,255,255,0.03);
+  color: var(--task-text);
+  border-color: rgba(255,255,255,0.03);
+}
+
+/* Inputs in dark mode use task background and text */
+:root[data-theme="dark"] .input-row input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .edit-input {
+  background: var(--task-bg);
+  color: var(--task-text);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* placeholder color subtle */
+:root[data-theme="dark"] .input-row input::placeholder,
+:root[data-theme="dark"] textarea::placeholder,
+:root[data-theme="dark"] .edit-input::placeholder {
+  color: rgba(154,163,173,0.5);
+}
 
 /* ensure palette visible over content */
 .list { position: relative; z-index: 0; }
