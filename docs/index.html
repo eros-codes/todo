@@ -51,8 +51,8 @@
       }
     </style>
 
-    <script type="module" crossorigin src="/assets/index-Dbe1b9yu.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dz1xQjDH.css">
+    <script type="module" crossorigin src="/todo/assets/index-DOfPEEO7.js"></script>
+    <link rel="stylesheet" crossorigin href="/todo/assets/index-Dz1xQjDH.css">
   </head>
   <body>
     <div id="root"></div>
@@ -86,17 +86,6 @@
         });
       })();
     </script>
-
-    <script>
-      // register service worker (only if supported)
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          // relative path so it works in docs/ and under /todo/ base
-          navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('SW registered', reg.scope))
-            .catch(err => console.warn('SW register failed', err));
-        });
-      }
-    </script>
+
   </body>
 </html>
