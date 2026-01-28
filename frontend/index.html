@@ -86,15 +86,22 @@
       })();
     </script>
 
-    <script>
-      // register service worker (only if supported)
+    <script type="module">
+      // Register service worker only in production build.
+      // Also automatically unregister any existing SW during development to avoid cached bundles.
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          // relative path so it works in docs/ and under /todo/ base
-          navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('SW registered', reg.scope))
-            .catch(err => console.warn('SW register failed', err));
-        });
+        if (import.meta.env.PROD) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+              .then(reg => console.log('SW registered', reg.scope))
+              .catch(err => console.warn('SW register failed', err));
+          });
+        } else {
+          // in dev: unregister any previously installed service workers (prevents stale/dist bundles)
+          navigator.serviceWorker.getRegistrations().then(regs => {
+            regs.forEach(r => r.unregister().catch(() => {}));
+          }).catch(() => {});
+        }
       }
     </script>
   </body>
