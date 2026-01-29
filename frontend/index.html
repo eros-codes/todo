@@ -2,21 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="./icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192-light.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Website</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <!-- PWA / mobile - use relative paths -->
-    <link rel="manifest" href="./manifest.json">
+    <!-- PWA / mobile - use relative paths; default to light manifest/icons -->
+    <link rel="manifest" href="./manifest-light.json">
     <meta name="theme-color" content="#2b6ff7">
 
-    <!-- iOS specific (Safari ignores manifest for icon) -->
-    <!-- ideally provide a proper 180x180 file; if not, 192 will be used and scaled -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./icon-192.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+    <!-- iOS / favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-light-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-light-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-light-192.png">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="To Do">

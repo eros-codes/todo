@@ -173,7 +173,10 @@ export default function TodoList({ title, storageKey, onDelete, theme, themeVers
 
   const displayColor = resolveColorForTheme(color);
   const isLightBg = isLightColor((displayColor || '#ffffff').toLowerCase());
-  const addButtonWhite = !isLightBg;
+  const normDisplay = normalizeColorString(displayColor || '#ffffff');
+  const isPureWhite = normDisplay === '#ffffff' || normDisplay === '#fff' || normDisplay === 'white';
+  // make the add button white when the card is colored (even if it's a light color like pink)
+  const addButtonWhite = !isPureWhite;
 
   return (
     <section

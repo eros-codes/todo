@@ -94,6 +94,45 @@ export default function App() {
       document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
     } catch {}
 
+    // Update PWA manifest and favicons to match theme (light/dark).
+    // Replace existing <link> elements (remove + recreate) and append a cache-busting query so browsers pick up the new files.
+    try {
+      const baseRaw = (import.meta.env.BASE_URL || './');
+      const base = String(baseRaw).replace(/\/$/, '') + '/';
+      const head = document.head;
+      const ts = Date.now();
+
+      // helper to remove existing links by selector
+      const removeAll = (sel) => {
+        document.querySelectorAll(sel).forEach(n => n.remove());
+      };
+
+      // remove old icons and apple-touch-icon
+      removeAll('link[rel~="icon"]');
+      removeAll('link[rel="apple-touch-icon"]');
+
+      // create and append icon links (192, 512)
+      const makeLink = (rel, attrs) => {
+        const l = document.createElement('link');
+        l.rel = rel;
+        Object.entries(attrs).forEach(([k,v]) => l.setAttribute(k, v));
+        head.appendChild(l);
+        return l;
+      };
+
+      makeLink('icon', { type: 'image/png', sizes: '192x192', href: base + `icons/icon-${theme}-192.png?v=${ts}` });
+      makeLink('icon', { type: 'image/png', sizes: '512x512', href: base + `icons/icon-${theme}-512.png?v=${ts}` });
+      makeLink('apple-touch-icon', { sizes: '180x180', href: base + `icons/icon-${theme}-192.png?v=${ts}` });
+
+      // replace manifest link
+      removeAll('link[rel="manifest"]');
+      makeLink('manifest', { href: base + `manifest-${theme}.json?v=${ts}` });
+
+      // update theme-color meta
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0b1116' : '#2b6ff7');
+    } catch {}
+
     // Convert stored category colors to matching theme variants and bump themeVersion
     try {
       const toDark = theme === 'dark';
@@ -147,15 +186,35 @@ export default function App() {
       <div className="app-header">
         <h1>TO DO LIST</h1>
 
-        <div className="theme-switch" aria-hidden>
+            <div className="theme-switch" aria-hidden>
           <label style={{display:'inline-flex',alignItems:'center',gap:8}}>
             <span style={{fontSize:12,color:'var(--muted)'}}>{theme === 'dark' ? 'Dark' : 'Light'}</span>
             <button
-              className={`switch ${theme === 'dark' ? 'active' : ''}`}
+              className={`theme-toggle ${theme === 'dark' ? 'active' : ''}`}
               aria-pressed={theme === 'dark'}
               onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
               title="Toggle theme"
-            />
+              aria-label="Toggle dark mode"
+            >
+              {/* Sun icon */}
+              <svg className="icon sun" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <circle cx="12" cy="12" r="4" fill="currentColor" />
+                <g stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <line x1="12" y1="1.5" x2="12" y2="4.5" />
+                  <line x1="12" y1="19.5" x2="12" y2="22.5" />
+                  <line x1="1.5" y1="12" x2="4.5" y2="12" />
+                  <line x1="19.5" y1="12" x2="22.5" y2="12" />
+                  <line x1="4.2" y1="4.2" x2="6.2" y2="6.2" />
+                  <line x1="17.8" y1="17.8" x2="19.8" y2="19.8" />
+                  <line x1="4.2" y1="19.8" x2="6.2" y2="17.8" />
+                  <line x1="17.8" y1="6.2" x2="19.8" y2="4.2" />
+                </g>
+              </svg>
+              {/* Moon icon */}
+              <svg className="icon moon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" />
+              </svg>
+            </button>
           </label>
         </div>
       </div>
